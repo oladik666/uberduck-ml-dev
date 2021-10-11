@@ -4,6 +4,7 @@ __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
 index = {"TextMelDataset": "data_loader.ipynb",
          "TextMelCollate": "data_loader.ipynb",
+         "AudioMelDataset": "data_loader.ipynb",
          "run": "exec.train_tacotron2.ipynb",
          "parse_args": "exec.train_tacotron2.ipynb",
          "Dataset": "exec.select_speakers.ipynb",
