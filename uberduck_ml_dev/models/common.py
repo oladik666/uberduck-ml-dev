@@ -314,6 +314,7 @@ class MelSTFT(torch.nn.Module):
         self.n_mel_channels = n_mel_channels
         self.sampling_rate = sampling_rate
         self.stft_fn = STFT(filter_length, hop_length, win_length)
+        # NOTE(zach): if mel_fmax is None, sampling_rate / 2 is used.
         mel_basis = librosa_mel(
             sampling_rate, filter_length, n_mel_channels, mel_fmin, mel_fmax
         )
