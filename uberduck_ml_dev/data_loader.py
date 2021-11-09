@@ -118,8 +118,13 @@ class TextMelDataset(Dataset):
         return (text_sequence, melspec, speaker_id, f0)
 
     def __getitem__(self, idx):
-        """Return"""
-        return self._get_data(self.audiopaths_and_text[idx])
+        """Return data for a single audio file + transcription."""
+        try:
+            data = self._get_data(self.audiopaths_and_text[idx])
+        except Exception:
+            print(f"Error while getting data: {self.audiopaths_and_text[idx]}")
+            raise
+        return data
 
     def __len__(self):
         if self.debug and self.debug_dataset_size:
@@ -133,6 +138,17 @@ class TextMelCollate:
     def __init__(self, n_frames_per_step: int = 1, include_f0: bool = False):
         self.n_frames_per_step = n_frames_per_step
         self.include_f0 = include_f0
+
+    def set_frames_per_step(self, n_frames_per_step):
+        """Set n_frames_step.
+
+        This is used to train with gradual training, where we start with a large
+        n_frames_per_step in order to learn attention quickly and decrease it
+        over the course of training in order to increase accuracy. Gradual training
+        reference:
+        https://erogol.com/gradual-training-with-tacotron-for-faster-convergence/
+        """
+        self.n_frames_per_step = n_frames_per_step
 
     def __call__(self, batch):
         """Collate's training batch from normalized text and mel-spectrogram
