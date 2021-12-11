@@ -1,5 +1,13 @@
-FROM us-docker.pkg.dev/vertex-ai/training/tf-gpu.2-6:latest
+FROM gcr.io/deeplearning-platform-release/pytorch-gpu.1-10
 
-pip install git+git://github.com/uberduck-ai/uberduck-ml-dev
+WORKDIR /root
 
-# CMD ["sleep", "3600"]
+RUN apt-get update && apt-get install -y espeak libsndfile-dev
+RUN pip install git+https://github.com/uberduck-ai/uberduck-ml-dev
+RUN mkdir /data
+RUN mkdir /root/models
+RUN mkdir /root/results
+
+COPY entrypoint.sh entrypoint.sh
+
+ENTRYPOINT ["./entrypoint.sh"]
