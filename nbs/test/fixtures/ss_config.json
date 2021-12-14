@@ -1,0 +1,11 @@
+{
+        "filelists": [
+                {
+                        "path": "/mnt/disks/uberduck-experiments-v0/uberduck-ml-exp/filelists/ubmulti_list.txt",
+                        "speakers": [
+                                "sam-lachow"
+                        ]
+                }
+        ],
+        "output": "/mnt/disks/uberduck-experiments-v0/uberduck-ml-exp/filelists/sam-lachow_list.txt"
+}

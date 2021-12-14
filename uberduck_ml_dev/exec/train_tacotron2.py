@@ -19,6 +19,16 @@ from ..models.mellotron import DEFAULTS as MELLOTRON_DEFAULTS
 def parse_args(args):
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", help="Path to JSON config")
+    parser.add_argument(
+        "--training_audiopaths_and_text", help="Path to training filelist", default=None
+    )
+    parser.add_argument(
+        "--val_audiopaths_and_text", help="Path to val filelist", default=None
+    )
+    parser.add_argument("--log_dir", help="Path to log_dir", default=None)
+    parser.add_argument(
+        "--checkpoint_path", help="Path to checkpoint_path", default=None
+    )
     args = parser.parse_args(args)
     return args
 
@@ -43,6 +53,7 @@ if __name__ == "__main__" and not IN_NOTEBOOK:
     if args.config:
         with open(args.config) as f:
             config.update(json.load(f))
+    config.update(vars(args))  # override config with cmd line args
     hparams = HParams(**config)
     if hparams.distributed_run:
         device_count = torch.cuda.device_count()
