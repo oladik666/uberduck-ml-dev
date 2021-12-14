@@ -104,8 +104,10 @@ def _convert_standard_multispeaker_relative_pd(f, inp: str, rel_path: str):
     speaker_id = 0
     speaker_dict = {}
     for speaker in speakers:
+        print(speaker)
         path = Path(inp + speaker)
         if not path.is_dir() or path.parts[-1].startswith("."):
+            print("gaa")
             continue
         files = os.listdir(path)
         filelists = [f for f in files if f.endswith(".txt")]
@@ -120,7 +122,7 @@ def _convert_standard_multispeaker_relative_pd(f, inp: str, rel_path: str):
         speaker_id += 1
     data_combined = pd.concat(list(speaker_dict.values()))
     data_combined[0] = rel_path + data_combined[0]
-    data_combined.to_csv(f)
+    data_combined.to_csv(f, sep="|", index=None, header=None)
 
 # Cell
 
@@ -148,7 +150,7 @@ if __name__ == "__main__" and not IN_NOTEBOOK:
     args = _parse_args(sys.argv[1:])
     if args.rel_path:
         _convert_standard_multispeaker_relative_pd(
-            args.f, args.output, args.rel_path
+            args.output, args.input, args.rel_path
         )  # make this for vctk / synthesize
     else:
         _generate_filelist(args.input, args.format, args.output)
