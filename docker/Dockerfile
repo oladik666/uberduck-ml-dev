@@ -6,8 +6,8 @@ RUN apt-get update && apt-get install -y espeak libsndfile-dev
 RUN pip install git+https://github.com/uberduck-ai/uberduck-ml-dev
 RUN mkdir /data
 RUN mkdir /secrets
-RUN mkdir /root/models
-RUN mkdir /root/results
+RUN mkdir /models
+RUN mkdir /results
 
 COPY secrets/gcloud_key.json /secrets/gcloud_key.json
 COPY entrypoint.sh entrypoint.sh
