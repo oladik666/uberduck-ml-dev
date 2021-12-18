@@ -870,6 +870,8 @@ class GradTTS(TTSModel):
         self.beta_min = hparams.beta_min
         self.beta_max = hparams.beta_max
         self.pe_scale = hparams.pe_scale
+        # NOTE(zach): Parametrize this later
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
         if self.n_spks > 1:
             self.spk_emb = torch.nn.Embedding(self.n_spks, self.spk_emb_dim)
@@ -951,9 +953,11 @@ class GradTTS(TTSModel):
 
         # Get encoder_outputs `mu_x` and log-scaled token durations `logw`
         mu_x, logw, x_mask = self.encoder(x, x_lengths, spk)
-
+        print("logw shape: ", logw.shape)
         w = torch.exp(logw) * x_mask
+        print("w shape", w.shape)
         w_ceil = torch.ceil(w) * length_scale
+        print(w_ceil)
         y_lengths = torch.clamp_min(torch.sum(w_ceil, [1, 2]), 1).long()
         y_max_length = int(y_lengths.max())
         y_max_length_ = fix_len_compatibility(y_max_length)
@@ -993,11 +997,16 @@ class GradTTS(TTSModel):
             text, cleaner_names=cleaner_names, p_arpabet=1.0, symbol_set="gradtts"
         )
         if intersperse_text:
-            x = torch.LongTensor(intersperse(seq, intersperse_token)).cuda()[None]
+            x = torch.LongTensor(intersperse(seq, intersperse_token))[None]
         else:
-            x = torch.LongTensor(seq).cuda()[None]
+            x = torch.LongTensor(seq)[None]
 
-        x_lengths = torch.LongTensor([x.shape[-1]]).cuda()
+        x_lengths = torch.LongTensor([x.shape[-1]])
+        print(x)
+        print(x_lengths)
+        if self.device == "cuda":
+            x = x.cuda()
+            x_lengths = x_lengths.cuda()
 
         y_enc, y_dec, attn = self.forward(
             x,
