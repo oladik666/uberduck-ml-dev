@@ -99,6 +99,7 @@ def tts(
 from typing import Optional
 
 from .models.common import MelSTFT
+from .utils.plot import plot_attention, plot_attention_phonemes
 
 
 @torch.no_grad()
@@ -112,33 +113,39 @@ def rhythm_transfer(
     arpabet=False,
     max_wav_value=32768.0,
     speaker_id=0,
+    plot=False,
+    attn=None
 ):
     assert len(original_audio.shape) == 1
     cpu_run = device == "cpu"
-    # TODO(zach): Support non-default STFT parameters.
-    stft = MelSTFT()
     p_arpabet = float(arpabet)
     sequence, input_lengths, _ = prepare_input_sequence(
         [original_text], arpabet=arpabet, cpu_run=cpu_run, symbol_set=symbol_set
     )
-    original_target_mel = stft.mel_spectrogram(original_audio[None])
-    if not cpu_run:
-        original_target_mel = original_target_mel.cuda()
-    max_len = original_target_mel.size(2)
     speaker_ids = torch.tensor([speaker_id], dtype=torch.long, device=device)
-    inputs = (
-        sequence,
-        input_lengths,
-        original_target_mel,
-        max_len,
-        torch.tensor([max_len], dtype=torch.long, device=device),
-        speaker_ids,
-    )
-    attn = model.get_alignment(inputs)
+    if attn is None:
+        # TODO(zach): Support non-default STFT parameters.
+        stft = MelSTFT()
+        original_target_mel = stft.mel_spectrogram(original_audio[None])
+        if not cpu_run:
+            original_target_mel = original_target_mel.cuda()
+        max_len = original_target_mel.size(2)
+        inputs = (
+            sequence,
+            input_lengths,
+            original_target_mel,
+            max_len,
+            torch.tensor([max_len], dtype=torch.long, device=device),
+            speaker_ids,
+        )
+        attn = model.get_alignment(inputs)
     _, mel_postnet, _, _ = model.inference_noattention(
         (sequence, input_lengths, speaker_ids, attn.transpose(0, 1))
     )
     y_g_hat = vocoder(torch.tensor(mel_postnet, dtype=torch.float, device=device))
     audio = y_g_hat.reshape(1, -1)
     audio = audio * max_wav_value
+    if plot:
+        plot_attention(attn[0].transpose(0, 1))
+        plot_attention_phonemes(sequence[0], attn[0].transpose(0, 1), NVIDIA_TACO2_SYMBOLS)
     return audio

@@ -908,6 +908,10 @@ class Tacotron2(TTSModel):
         text, input_lengths, speaker_ids, attention_maps = inputs
         embedded_inputs = self.embedding(text).transpose(1, 2)
         embedded_text = self.encoder.inference(embedded_inputs, input_lengths)
+        encoder_outputs = embedded_text
+        if self.speaker_embedding:
+            embedded_speakers = self.speaker_embedding(speaker_ids)[:, None]
+            encoder_outputs += self.spkr_lin(embedded_speakers)
 
         encoder_outputs = torch.cat((embedded_text,), dim=2)
 
