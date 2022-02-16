@@ -48,7 +48,7 @@ if __name__ == "__main__" and not IN_NOTEBOOK:
     config.update(vars(args))
     hparams = HParams(**config)
     if hparams.distributed_run:
-        device_count = 1
+        device_count = 8
         xmp.spawn(run, args=(device_count, hparams), nprocs=8, start_method='fork')
     else:
         run(None, None, hparams)
