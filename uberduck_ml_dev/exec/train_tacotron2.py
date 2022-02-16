@@ -11,6 +11,10 @@ import sys
 import json
 import torch
 from torch import multiprocessing as mp
+import torch_xla
+import torch_xla.distributed.parallel_loader as pl
+import torch_xla.core.xla_model as xm
+import torch_xla.distributed.xla_multiprocessing as xmp
 
 # Cell
 def parse_args(args):
@@ -35,6 +39,7 @@ try:
 except:
     IN_NOTEBOOK = False
 if __name__ == "__main__" and not IN_NOTEBOOK:
+    device = xm.xla_device()
     args = parse_args(sys.argv[1:])
     config = TACOTRON2_TRAINER_DEFAULTS.values()
     if args.config:
@@ -43,7 +48,7 @@ if __name__ == "__main__" and not IN_NOTEBOOK:
     config.update(vars(args))
     hparams = HParams(**config)
     if hparams.distributed_run:
-        device_count = torch.cuda.device_count()
-        mp.spawn(run, (device_count, hparams), device_count)
+        device_count = 8
+        xmp.spawn(run, args=(device_count, hparams), device_count=1, nprocs=8, start_method='fork')
     else:
         run(None, None, hparams)
