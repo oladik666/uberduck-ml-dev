@@ -17,6 +17,14 @@ from ..models.tacotron2 import Tacotron2
 from ..utils.plot import save_figure_to_numpy
 from ..utils.utils import reduce_tensor
 from ..monitoring.statistics import get_alignment_metrics
+import torch_xla
+import torch_xla.debug.metrics as met
+import torch_xla.distributed.parallel_loader as pl
+import torch_xla.utils.utils as xu
+import torch_xla.core.xla_model as xm
+import torch_xla.debug.profiler as xp
+import torch_xla.distributed.xla_multiprocessing as xmp
+import torch_xla.test.test_utils as test_utils
 
 
 class Tacotron2Loss(nn.Module):
@@ -425,7 +433,7 @@ class Tacotron2Trainer(TTSTrainer):
             model = DDP(model, device_ids=[self.rank])
         optimizer = torch.optim.Adam(
             model.parameters(),
-            lr=self.learning_rate,
+            lr=self.learning_rate * xm.xrt_world_size(),
             weight_decay=self.weight_decay,
         )
         start_epoch = 0
