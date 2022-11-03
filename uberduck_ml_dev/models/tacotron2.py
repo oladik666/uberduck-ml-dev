@@ -747,6 +747,9 @@ DEFAULTS = HParams(
     sample_inference_speaker_ids=None,
     sample_inference_text="That quick beige fox jumped in the air loudly over the thin dog fence.",
     distributed_run=False,
+    lrdecay_min=0.00001,
+    lrdecay_start=1000,
+    lrdecay_steps=1000,
 )
 
 config = DEFAULTS.values()
