@@ -547,7 +547,7 @@ class Tacotron2Trainer(TTSTrainer):
                     step_duration_seconds,
                 )
                 log_stop = time.time()
-                log_str = f"epoch: {epoch}/{self.epochs} | batch: {batch_idx}/{len(train_loader)} | loss: {reduced_mel_loss:.2f} | mel: {reduced_loss:.2f} | gate: {reduced_gate_loss:.3f} | t: {start_time - previous_start_time:.2f}s | w: {(time.perf_counter() - train_start_time)/(60*60):.2f}h"
+                log_str = f"epoch: {epoch}/{self.epochs} | batch: {batch_idx}/{len(train_loader)} | loss: {reduced_mel_loss:.2f} | mel: {reduced_loss:.2f} | gate: {reduced_gate_loss:.3f} | t: {start_time - previous_start_time:.2f}s | w: {(time.perf_counter() - train_start_time)/(60*60):.2f}h | lr: {self.learning_rate:.4e}"
                 if self.distributed_run:
                     log_str += f" | rank: {self.rank}"
                 print(log_str)
