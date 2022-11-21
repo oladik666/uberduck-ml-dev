@@ -192,7 +192,7 @@ SYMBOL_SETS = {
     PORTUGUESE_SYMBOLS: symbols_portuguese,
     POLISH_SYMBOLS: symbols_polish,
     DUTCH_SYMBOLS: symbols_dutch,
-    NORWEIGAN_SYMBOLS: symbols_norwegian,
+    NORWEGIAN_SYMBOLS: symbols_norwegian,
     SPANISH_SYMBOLS: symbols_spanish,
     RUSSIAN_SYMBOLS: symbols_russian,
     UKRAINIAN_SYMBOLS: symbols_ukrainian,
